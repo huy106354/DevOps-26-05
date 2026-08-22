@@ -1,0 +1,13 @@
+node_modules
+.tmp
+.git
+.gitignore
+.editorconfig
+.eslintrc
+.eslintignore
+*.log
+temp_sails
+Dockerfile
+docker-compose.yml
+.npmrc
+.sailsrc

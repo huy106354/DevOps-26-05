@@ -1,0 +1,175 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Quản lý Công văn Đi & Đến</h1>
+    <p class="page-subtitle">Theo dõi, số hóa văn bản, luân chuyển công việc, và giám sát tiến độ xử lý.</p>
+  </div>
+  <div style="display: flex; gap: 12px;">
+    <% if (current_user.roles.includes('admin') || current_user.roles.includes('office')) { %>
+      <a href="/documents/create-incoming" class="btn btn-primary btn-sm" style="padding: 10px 16px;">
+        <span>📥</span> Đăng ký Công văn Đến
+      </a>
+      <a href="/documents/create-outgoing" class="btn btn-secondary btn-sm" style="padding: 10px 16px;">
+        <span>📤</span> Đăng ký Công văn Đi
+      </a>
+    <% } %>
+  </div>
+</div>
+
+<!-- Filters Panel -->
+<div class="panel" style="margin-bottom: 24px;">
+  <form action="/documents" method="GET" class="filter-bar">
+    <div class="filter-item">
+      <span>🔍</span>
+      <input type="text" name="keyword" placeholder="Nhập số công văn, trích yếu..." value="<%= filters.keyword %>">
+    </div>
+    
+    <div class="filter-item">
+      <label for="doc_type">Loại văn bản:</label>
+      <select id="doc_type" name="doc_type">
+        <option value="">-- Tất cả --</option>
+        <option value="incoming" <%= filters.doc_type === 'incoming' ? 'selected' : '' %>>Công văn Đến</option>
+        <option value="outgoing" <%= filters.doc_type === 'outgoing' ? 'selected' : '' %>>Công văn Đi</option>
+      </select>
+    </div>
+    
+    <div class="filter-item">
+      <label for="status">Tiến độ:</label>
+      <select id="status" name="status">
+        <option value="">-- Tất cả --</option>
+        <option value="new" <%= filters.status === 'new' ? 'selected' : '' %>>Mới tiếp nhận</option>
+        <option value="assigned" <%= filters.status === 'assigned' ? 'selected' : '' %>>Đã chuyển giao</option>
+        <option value="processing" <%= filters.status === 'processing' ? 'selected' : '' %>>Đang xử lý</option>
+        <option value="completed" <%= filters.status === 'completed' ? 'selected' : '' %>>Đã hoàn thành</option>
+        <option value="overdue" <%= filters.status === 'overdue' ? 'selected' : '' %>>Quá hạn</option>
+      </select>
+    </div>
+
+    <div class="filter-item">
+      <label for="urgency">Độ khẩn:</label>
+      <select id="urgency" name="urgency">
+        <option value="">-- Tất cả --</option>
+        <option value="low" <%= filters.urgency === 'low' ? 'selected' : '' %>>Thấp</option>
+        <option value="normal" <%= filters.urgency === 'normal' ? 'selected' : '' %>>Bình thường</option>
+        <option value="high" <%= filters.urgency === 'high' ? 'selected' : '' %>>Khẩn</option>
+        <option value="express" <%= filters.urgency === 'express' ? 'selected' : '' %>>Hỏa tốc</option>
+      </select>
+    </div>
+    
+    <button type="submit" class="btn btn-secondary btn-sm">Tìm lọc</button>
+    <a href="/documents" class="btn btn-secondary btn-sm" style="padding: 8px 12px;">Reset</a>
+  </form>
+</div>
+
+<!-- Documents List Table -->
+<div class="panel">
+  <div class="panel-body" style="padding: 0;">
+    <% if (documents.length === 0) { %>
+      <div style="padding: 48px; text-align: center; color: var(--text-muted);">
+        <div style="font-size: 40px; margin-bottom: 12px;">📂</div>
+        <h3>Không tìm thấy công văn nào</h3>
+        <p style="margin-top: 8px;">Vui lòng điều chỉnh điều kiện lọc hoặc nhập tài liệu mới.</p>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Loại</th>
+              <th>Số / Ký hiệu</th>
+              <th>Trích yếu nội dung</th>
+              <th>Cơ quan ban hành</th>
+              <th>Ngày đến/đi</th>
+              <th>Độ khẩn</th>
+              <th>Độ mật</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% documents.forEach(function(doc) { %>
+              <tr>
+                <td>
+                  <% if (doc.doc_type === 'incoming') { %>
+                    <span class="badge badge-primary">Đến 📥</span>
+                  <% } else { %>
+                    <span class="badge badge-success" style="opacity: 0.85;">Đi 📤</span>
+                  <% } %>
+                </td>
+                <td style="font-weight: 700; color: var(--primary);">
+                  <%= doc.doc_number %>
+                </td>
+                <td style="font-weight: 600; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <a href="/documents/<%= doc.id %>"><%= doc.summary %></a>
+                </td>
+                <td>
+                  <%= doc.issuing_agency %>
+                </td>
+                <td style="font-size: 13px; color: var(--text-secondary);">
+                  <%= new Date(doc.received_sent_date).toLocaleDateString('vi-VN') %>
+                </td>
+                <td>
+                  <% if (doc.urgency === 'express') { %>
+                    <span class="badge badge-danger">Hỏa tốc 🔥</span>
+                  <% } else if (doc.urgency === 'high') { %>
+                    <span class="badge badge-warning">Khẩn ⚡</span>
+                  <% } else if (doc.urgency === 'normal') { %>
+                    <span class="badge badge-info">Thường</span>
+                  <% } else { %>
+                    <span class="badge badge-primary" style="opacity: 0.7;">Thấp</span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (doc.confidentiality === 'top_secret') { %>
+                    <span class="badge badge-danger">Tối mật 🔒</span>
+                  <% } else if (doc.confidentiality === 'confidential') { %>
+                    <span class="badge badge-warning">Mật 🛡️</span>
+                  <% } else { %>
+                    <span class="badge badge-primary" style="opacity: 0.7;">Thường</span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (doc.status === 'completed') { %>
+                    <span class="badge badge-success">Đã đóng</span>
+                  <% } else if (doc.status === 'processing') { %>
+                    <span class="badge badge-warning">Đang xử lý</span>
+                  <% } else if (doc.status === 'assigned') { %>
+                    <span class="badge badge-info">Đã giao việc</span>
+                  <% } else if (doc.status === 'new') { %>
+                    <span class="badge badge-primary">Mới</span>
+                  <% } else { %>
+                    <span class="badge badge-danger">Trễ hạn ⏳</span>
+                  <% } %>
+                </td>
+                <td>
+                  <a href="/documents/<%= doc.id %>" class="btn btn-secondary btn-sm" style="padding: 6px 12px; font-size: 12px;">
+                    Chi tiết ➔
+                  </a>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Pagination Bar -->
+      <% if (pagination.total_pages > 1) { %>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-top: 1px solid var(--border); background-color: var(--bg-tertiary);">
+          <div style="font-size: 13px; color: var(--text-secondary); font-weight: 500;">
+            Hiển thị <strong><%= documents.length %></strong> trên tổng số <strong><%= pagination.total_count %></strong> công văn.
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <% if (pagination.page > 1) { %>
+              <a href="/documents?page=<%= pagination.page - 1 %>&keyword=<%= filters.keyword %>&doc_type=<%= filters.doc_type %>&status=<%= filters.status %>&urgency=<%= filters.urgency %>" class="btn btn-secondary btn-sm" style="padding: 6px 12px;">⬅️ Trước</a>
+            <% } %>
+            <span style="font-size: 13px; font-weight: 700; padding: 0 8px; color: var(--text-primary);">
+              Trang <%= pagination.page %> / <%= pagination.total_pages %>
+            </span>
+            <% if (pagination.page < pagination.total_pages) { %>
+              <a href="/documents?page=<%= pagination.page + 1 %>&keyword=<%= filters.keyword %>&doc_type=<%= filters.doc_type %>&status=<%= filters.status %>&urgency=<%= filters.urgency %>" class="btn btn-secondary btn-sm" style="padding: 6px 12px;">Sau ➡️</a>
+            <% } %>
+          </div>
+        </div>
+      <% } %>
+    <% } %>
+  </div>
+</div>

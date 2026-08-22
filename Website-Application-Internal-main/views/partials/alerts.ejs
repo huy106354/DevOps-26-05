@@ -1,0 +1,24 @@
+<% if (typeof req !== 'undefined' && req.session && req.session.flash) { %>
+  <% if (req.session.flash.success_message) { %>
+    <div class="alert alert-success">
+      <span>✔️</span>
+      <div><%= req.session.flash.success_message %></div>
+    </div>
+  <% } %>
+  <% if (req.session.flash.error_message) { %>
+    <div class="alert alert-danger">
+      <span>⚠️</span>
+      <div><%= req.session.flash.error_message %></div>
+    </div>
+  <% } %>
+  <% if (req.session.flash.warning_message) { %>
+    <div class="alert alert-warning">
+      <span>⚠️</span>
+      <div><%= req.session.flash.warning_message %></div>
+    </div>
+  <% } %>
+  <% 
+    // Clear flash messages so they only display once
+    delete req.session.flash; 
+  %>
+<% } %>

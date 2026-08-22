@@ -1,0 +1,184 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Quản trị Hệ thống & Dynamic Master Data</h1>
+    <p class="page-subtitle">Quản lý cấu hình phòng ban động, tối ưu hóa hiệu suất với cache hệ thống, và giám sát bảo mật hệ thống.</p>
+  </div>
+</div>
+
+<!-- Dynamic Cache Control & Statistics -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-bottom: 28px;">
+  
+  <!-- Cache Control Panel -->
+  <div class="panel">
+    <div class="panel-header">
+      <h3 class="panel-title">⚡ Tối ưu hóa Hiệu năng & Cache Master Data</h3>
+    </div>
+    <div class="panel-body" style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 14px; margin-bottom: 8px;">
+          Động cơ Cache hiện tại: <strong><%= cache_status.engine %></strong>
+        </div>
+        <div style="font-size: 14px; margin-bottom: 12px;">
+          Trạng thái Cache Master Data (Phòng ban): 
+          <% if (cache_status.is_cached) { %>
+            <span class="badge badge-success">Đang đọc từ Cache (HIT) ⚡</span>
+          <% } else { %>
+            <span class="badge badge-warning">Đọc từ Database (MISS - Đã ghi lại cache) 📥</span>
+          <% } %>
+        </div>
+        <p style="font-size: 12px; color: var(--text-secondary); max-width: 480px;">
+          Hệ thống tự động lưu trữ danh sách phòng ban và cấu hình hệ thống vào cache nhằm tăng tốc độ tải trang tối đa. Khi dữ liệu phòng ban thay đổi, cache sẽ tự động bị xóa (invalidation) để nạp mới.
+        </p>
+      </div>
+
+      <!-- Clear cache form -->
+      <form action="/admin/system/clear-cache" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa toàn bộ bộ nhớ Cache Master Data? Điều này sẽ buộc hệ thống nạp lại dữ liệu từ cơ sở dữ liệu.');">
+        <button type="submit" class="btn btn-danger" style="box-shadow: 0 4px 12px rgba(239,68,68,0.25);">
+          🔥 Xóa sạch bộ nhớ Cache
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Quick System Stats -->
+  <div class="panel" style="display: flex; flex-direction: column; justify-content: center; padding: 24px; text-align: center; background-color: var(--primary-glow); border-color: var(--primary);">
+    <h3 style="font-size: 15px; margin-bottom: 6px; color: var(--primary);">Nhật ký Audit Log</h3>
+    <div style="font-family: var(--font-title); font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
+      <%= total_audit_logs %> logs
+    </div>
+    <p style="font-size: 11.5px; color: var(--text-secondary);">
+      Mọi thay đổi nhạy cảm đều được ghi lại tự động phục vụ công tác thanh tra nội bộ.
+    </p>
+  </div>
+
+</div>
+
+<!-- MASTER DATA BUILDER: DEPARTMENTS -->
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 32px;">
+  
+  <!-- Left Side: Create Department Form -->
+  <div class="panel">
+    <div class="panel-header">
+      <h3 class="panel-title">➕ Thêm phòng ban mới</h3>
+    </div>
+    <div class="panel-body">
+      <form action="/admin/system/departments" method="POST">
+        
+        <!-- Tên phòng ban -->
+        <div class="form-group">
+          <label for="name" class="form-label required">Tên phòng ban</label>
+          <input type="text" id="name" name="name" class="form-control" placeholder="Ví dụ: Phòng Kỹ thuật Công nghệ" required>
+        </div>
+
+        <!-- Phòng ban cấp trên (Self-referential parent) -->
+        <div class="form-group">
+          <label for="parent_id" class="form-label">Phòng ban cấp trên</label>
+          <select id="parent_id" name="parent_id" class="form-control">
+            <option value="">-- Không có (Cấp cao nhất) --</option>
+            <% departments.forEach(function(d) { %>
+              <option value="<%= d.id %>"><%= d.name %></option>
+            <% }); %>
+          </select>
+        </div>
+
+        <!-- Quản lý phụ trách -->
+        <div class="form-group" style="margin-bottom: 24px;">
+          <label for="manager_id" class="form-label">Cán bộ phụ trách (Manager)</label>
+          <select id="manager_id" name="manager_id" class="form-control">
+            <option value="">-- Chưa gán trưởng bộ phận --</option>
+            <% active_users.forEach(function(u) { %>
+              <option value="<%= u.id %>"><%= u.full_name %> (<%= u.email %>)</option>
+            <% }); %>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 13px;">➕ Khởi tạo phòng ban</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Right Side: Departments Directory Table -->
+  <div class="panel">
+    <div class="panel-header">
+      <h3 class="panel-title">📂 Sơ đồ & Danh sách phòng ban công ty</h3>
+    </div>
+    <div class="panel-body" style="padding: 0;">
+      <% if (departments.length === 0) { %>
+        <div style="padding: 32px; text-align: center; color: var(--text-muted);">
+          Chưa có phòng ban nào trong cơ sở dữ liệu. Vui lòng tạo mới ở form bên trái!
+        </div>
+      <% } else { %>
+        <div class="table-responsive">
+          <table class="custom-table" style="font-size: 13.5px;">
+            <thead>
+              <tr>
+                <th>Tên phòng ban</th>
+                <th>Phòng ban cấp trên</th>
+                <th>Trưởng phòng (Manager)</th>
+                <th>Thời gian tạo</th>
+                <th>Trạng thái dữ liệu</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% departments.forEach(function(d) { %>
+                <tr>
+                  <td style="font-weight: 700; color: var(--primary);"><%= d.name %></td>
+                  <td>
+                    <%= d.parent_id ? d.parent_id.name : 'Cấp Tập đoàn' %>
+                  </td>
+                  <td style="font-weight: 600;">
+                    <%= d.manager_id ? d.manager_id.full_name : 'Chưa bổ nhiệm' %>
+                  </td>
+                  <td style="color: var(--text-secondary); font-size: 12px;">
+                    <%= new Date(d.createdAt).toLocaleDateString('vi-VN') %>
+                  </td>
+                  <td>
+                    <span class="badge badge-success">Đã Cache</span>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+  
+</div>
+
+<!-- SYSTEM ROLES MATRIX REFERENCE -->
+<div class="panel" style="margin-top: 32px;">
+  <div class="panel-header">
+    <h3 class="panel-title">🛡️ Quản lý Vai trò hệ thống & Bảo mật</h3>
+  </div>
+  <div class="panel-body" style="padding: 0;">
+    <div class="table-responsive">
+      <table class="custom-table" style="font-size: 13.5px;">
+        <thead>
+          <tr>
+            <th>Mã vai trò</th>
+            <th>Tên hiển thị</th>
+            <th>Mô tả chức năng</th>
+            <th>Loại vai trò</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% system_roles.forEach(function(role) { %>
+            <tr>
+              <td style="font-family: monospace; font-weight: 700;"><%= role.id %></td>
+              <td style="font-weight: 600;"><%= role.name %></td>
+              <td><%= role.description || 'Truy cập các tính năng thuộc phân hệ.' %></td>
+              <td>
+                <% if (role.is_system_role) { %>
+                  <span class="badge badge-primary">Vai trò hệ thống</span>
+                <% } else { %>
+                  <span class="badge badge-info">Cấu hình thêm</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

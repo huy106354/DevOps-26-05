@@ -1,0 +1,85 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">VN168</div>
+      <div class="auth-subtitle">Hệ thống Quản lý Nội bộ Doanh nghiệp</div>
+      <h3 style="margin-top: 16px; font-weight: 700; font-size: 20px;">Đăng ký tài khoản mới</h3>
+    </div>
+
+    <!-- Alert dynamic messages -->
+    <% if (typeof req !== 'undefined' && req.session && req.session.flash && req.session.flash.error_message) { %>
+      <div class="alert alert-danger" style="margin-bottom: 24px;">
+        <span>⚠️</span>
+        <div><%= req.session.flash.error_message %></div>
+      </div>
+      <% delete req.session.flash.error_message; %>
+    <% } %>
+
+    <form action="/auth/register" method="POST">
+      
+      <!-- Họ và Tên -->
+      <div class="form-group">
+        <label for="full_name" class="form-label required">Họ và tên</label>
+        <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Nhập họ và tên của bạn" value="<%= typeof form_data !== 'undefined' ? form_data.full_name || '' : '' %>" required>
+        <% if (typeof errors !== 'undefined' && errors.full_name) { %>
+          <span class="form-error"><%= errors.full_name %></span>
+        <% } %>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email" class="form-label required">Địa chỉ Email</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="example@company.com" value="<%= typeof form_data !== 'undefined' ? form_data.email || '' : '' %>" required>
+        <% if (typeof errors !== 'undefined' && errors.email) { %>
+          <span class="form-error"><%= errors.email %></span>
+        <% } %>
+      </div>
+
+      <!-- Số điện thoại -->
+      <div class="form-group">
+        <label for="phone" class="form-label required">Số điện thoại</label>
+        <input type="tel" id="phone" name="phone" class="form-control" placeholder="0912345678" value="<%= typeof form_data !== 'undefined' ? form_data.phone || '' : '' %>" required>
+        <% if (typeof errors !== 'undefined' && errors.phone) { %>
+          <span class="form-error"><%= errors.phone %></span>
+        <% } %>
+      </div>
+
+      <!-- Vai trò phân quyền -->
+      <div class="form-group">
+        <label for="role" class="form-label required">Phòng ban / Vai trò đăng ký</label>
+        <select id="role" name="role" class="form-control" required>
+          <option value="office" <%= typeof form_data !== 'undefined' && form_data.role_selection === 'office' ? 'selected' : '' %>>Văn thư / Hành chính</option>
+          <option value="training" <%= typeof form_data !== 'undefined' && form_data.role_selection === 'training' ? 'selected' : '' %>>Cán bộ Đào tạo</option>
+          <option value="sales" <%= typeof form_data !== 'undefined' && form_data.role_selection === 'sales' ? 'selected' : '' %>>Nhân viên Kinh doanh</option>
+          <option value="assets" <%= typeof form_data !== 'undefined' && form_data.role_selection === 'assets' ? 'selected' : '' %>>Quản lý Tài sản</option>
+          <option value="manager" <%= typeof form_data !== 'undefined' && form_data.role_selection === 'manager' ? 'selected' : '' %>>Ban Giám đốc</option>
+          <option value="admin" <%= typeof form_data !== 'undefined' && form_data.role_selection === 'admin' ? 'selected' : '' %>>Quản trị hệ thống (Admin)</option>
+        </select>
+      </div>
+
+      <!-- Mật khẩu -->
+      <div class="form-group">
+        <label for="password" class="form-label required">Mật khẩu</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="Tối thiểu 6 ký tự" required>
+        <% if (typeof errors !== 'undefined' && errors.password) { %>
+          <span class="form-error"><%= errors.password %></span>
+        <% } %>
+      </div>
+
+      <!-- Xác nhận mật khẩu -->
+      <div class="form-group" style="margin-bottom: 32px;">
+        <label for="confirm_password" class="form-label required">Xác nhận mật khẩu</label>
+        <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Nhập lại mật khẩu" required>
+        <% if (typeof errors !== 'undefined' && errors.confirm_password) { %>
+          <span class="form-error"><%= errors.confirm_password %></span>
+        <% } %>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%;">Đăng ký tài khoản</button>
+    </form>
+
+    <div style="text-align: center; margin-top: 24px; font-size: 14px; color: var(--text-secondary);">
+      Đã có tài khoản? <a href="/login" style="font-weight: 600;">Đăng nhập ngay</a>
+    </div>
+  </div>
+</div>

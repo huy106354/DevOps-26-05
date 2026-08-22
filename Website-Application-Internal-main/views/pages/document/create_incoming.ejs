@@ -1,0 +1,160 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Tiếp nhận Công văn Đến mới</h1>
+    <p class="page-subtitle">Nhập thông tin chi tiết và đính kèm tệp tài liệu số hóa của công văn đến.</p>
+  </div>
+  <a href="/documents" class="btn btn-secondary">
+    ➔ Quay lại danh sách
+  </a>
+</div>
+
+<div class="panel" style="max-width: 800px; margin: 0 auto;">
+  <div class="panel-header">
+    <h3 class="panel-title">Phiếu ghi nhận công văn đến</h3>
+  </div>
+  <div class="panel-body">
+    <form action="/documents/create-incoming" method="POST">
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        
+        <!-- Số / Ký hiệu -->
+        <div class="form-group">
+          <label for="doc_number" class="form-label required">Số / Ký hiệu văn bản</label>
+          <input type="text" id="doc_number" name="doc_number" class="form-control" placeholder="Ví dụ: 125/QĐ-UBND" value="<%= typeof form_data !== 'undefined' ? form_data.doc_number || '' : '' %>" required>
+          <% if (typeof errors !== 'undefined' && errors.doc_number) { %>
+            <span class="form-error"><%= errors.doc_number %></span>
+          <% } %>
+        </div>
+
+        <!-- Cơ quan ban hành -->
+        <div class="form-group">
+          <label for="issuing_agency" class="form-label required">Cơ quan ban hành</label>
+          <input type="text" id="issuing_agency" name="issuing_agency" class="form-control" placeholder="Tên đơn vị ban hành" value="<%= typeof form_data !== 'undefined' ? form_data.issuing_agency || '' : '' %>" required>
+          <% if (typeof errors !== 'undefined' && errors.issuing_agency) { %>
+            <span class="form-error"><%= errors.issuing_agency %></span>
+          <% } %>
+        </div>
+        
+      </div>
+
+      <!-- Trích yếu nội dung -->
+      <div class="form-group">
+        <label for="summary" class="form-label required">Trích yếu nội dung công văn</label>
+        <textarea id="summary" name="summary" class="form-control" rows="3" placeholder="Tóm tắt ngắn gọn nội dung cốt lõi của công văn" required><%= typeof form_data !== 'undefined' ? form_data.summary || '' : '' %></textarea>
+        <% if (typeof errors !== 'undefined' && errors.summary) { %>
+          <span class="form-error"><%= errors.summary %></span>
+        <% } %>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        
+        <!-- Ngày ban hành -->
+        <div class="form-group">
+          <label for="issued_date" class="form-label required">Ngày ban hành văn bản</label>
+          <input type="date" id="issued_date" name="issued_date" class="form-control" value="<%= typeof form_data !== 'undefined' ? form_data.issued_date || '' : '' %>" required>
+          <% if (typeof errors !== 'undefined' && errors.issued_date) { %>
+            <span class="form-error"><%= errors.issued_date %></span>
+          <% } %>
+        </div>
+
+        <!-- Ngày đến -->
+        <div class="form-group">
+          <label for="received_date" class="form-label required">Ngày tiếp nhận đến</label>
+          <input type="date" id="received_date" name="received_date" class="form-control" value="<%= typeof form_data !== 'undefined' ? form_data.received_date || '' : '' %>" required>
+          <% if (typeof errors !== 'undefined' && errors.received_date) { %>
+            <span class="form-error"><%= errors.received_date %></span>
+          <% } %>
+        </div>
+        
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        
+        <!-- Độ khẩn -->
+        <div class="form-group">
+          <label for="urgency" class="form-label required">Độ khẩn công văn</label>
+          <select id="urgency" name="urgency" class="form-control" required>
+            <option value="normal" <%= typeof form_data !== 'undefined' && form_data.urgency === 'normal' ? 'selected' : '' %>>Bình thường</option>
+            <option value="low" <%= typeof form_data !== 'undefined' && form_data.urgency === 'low' ? 'selected' : '' %>>Thấp</option>
+            <option value="high" <%= typeof form_data !== 'undefined' && form_data.urgency === 'high' ? 'selected' : '' %>>Khẩn</option>
+            <option value="express" <%= typeof form_data !== 'undefined' && form_data.urgency === 'express' ? 'selected' : '' %>>Hỏa tốc</option>
+          </select>
+        </div>
+
+        <!-- Độ mật -->
+        <div class="form-group">
+          <label for="confidentiality" class="form-label required">Độ bảo mật thông tin</label>
+          <select id="confidentiality" name="confidentiality" class="form-control" required>
+            <option value="normal" <%= typeof form_data !== 'undefined' && form_data.confidentiality === 'normal' ? 'selected' : '' %>>Bình thường</option>
+            <option value="confidential" <%= typeof form_data !== 'undefined' && form_data.confidentiality === 'confidential' ? 'selected' : '' %>>Công văn mật</option>
+            <option value="top_secret" <%= typeof form_data !== 'undefined' && form_data.confidentiality === 'top_secret' ? 'selected' : '' %>>Tối mật</option>
+          </select>
+        </div>
+        
+      </div>
+
+      <!-- File Attachment Simulation -->
+      <div class="form-group" style="margin-bottom: 32px;">
+        <label for="mock_filename" class="form-label">Tài liệu số hóa (File đính kèm giả lập)</label>
+        <select id="mock_filename" name="mock_filename" class="form-control">
+          <option value="cong_van_nhan_ban_hanh_scan.pdf">📄 Bản scan công văn đóng dấu chính thức (PDF - 154KB)</option>
+          <option value="tai_lieu_ky_thuat_kem_theo.pdf">📄 Tài liệu phụ lục đính kèm hướng dẫn (PDF - 1.2MB)</option>
+          <option value="ke_hoach_sprint_2026.docx">📄 Dự thảo kế hoạch triển khai (DOCX - 45KB)</option>
+          <option value="">(Không đính kèm tệp tin)</option>
+        </select>
+        <span style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: block;">
+          Hệ thống sẽ giả lập hành vi upload tệp tin thực tế, lưu trữ đường dẫn mã hóa an toàn và gán bản quyền người dùng.
+        </span>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%;">Nhập công văn đến</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const summary_input = document.getElementById('summary');
+    const urgency_select = document.getElementById('urgency');
+    const confidentiality_select = document.getElementById('confidentiality');
+
+    if (summary_input && urgency_select && confidentiality_select) {
+      const warning_box = document.createElement('div');
+      warning_box.style.display = 'none';
+      warning_box.style.marginTop = '12px';
+      warning_box.style.padding = '10px 14px';
+      warning_box.style.backgroundColor = 'var(--warning-bg)';
+      warning_box.style.color = 'var(--warning-text)';
+      warning_box.style.fontSize = '12px';
+      warning_box.style.fontWeight = '600';
+      warning_box.style.borderRadius = 'var(--radius-sm)';
+      warning_box.style.border = '1px solid var(--warning)';
+      warning_box.style.lineHeight = '1.5';
+      summary_input.parentNode.appendChild(warning_box);
+
+      summary_input.addEventListener('input', function() {
+        const val = this.value.toLowerCase();
+        let is_express = val.includes('hỏa tốc') || val.includes('khẩn cấp') || val.includes('gấp');
+        let is_confidential = val.includes('mật') || val.includes('bảo mật') || val.includes('tối mật');
+
+        if (is_express || is_confidential) {
+          warning_box.style.display = 'block';
+          let warnings = [];
+
+          if (is_express) {
+            urgency_select.value = 'express';
+            warnings.push('⚡ Tự động chuyển độ khẩn sang "HỎA TỐC" do có từ khóa đặc biệt.');
+          }
+          if (is_confidential) {
+            confidentiality_select.value = 'confidential';
+            warnings.push('🔒 Tự động chuyển độ mật sang "CÔNG VĂN MẬT" do có từ khóa bảo mật.');
+          }
+
+          warning_box.innerHTML = warnings.join('<br>');
+        } else {
+          warning_box.style.display = 'none';
+        }
+      });
+    }
+  });
+</script>

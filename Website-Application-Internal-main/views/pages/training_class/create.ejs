@@ -1,0 +1,113 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Khởi tạo Lớp tập huấn mới</h1>
+    <p class="page-subtitle">Nhập thông tin chi tiết của lớp học để lên lịch tổ chức đào tạo.</p>
+  </div>
+  <a href="/training/classes" class="btn btn-secondary">
+    ➔ Quay lại danh sách
+  </a>
+</div>
+
+<div class="panel" style="max-width: 800px; margin: 0 auto;">
+  <div class="panel-header">
+    <h3 class="panel-title">Phiếu thông tin lớp tập huấn</h3>
+  </div>
+  <div class="panel-body">
+    <form action="/training/classes/create" method="POST">
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        
+        <!-- Mã lớp -->
+        <div class="form-group">
+          <label for="class_code" class="form-label required">Mã lớp tập huấn</label>
+          <input type="text" id="class_code" name="class_code" class="form-control" placeholder="Ví dụ: AI-K26-T1" value="<%= typeof form_data !== 'undefined' ? form_data.class_code || '' : '' %>" required>
+          <% if (typeof errors !== 'undefined' && errors.class_code) { %>
+            <span class="form-error"><%= errors.class_code %></span>
+          <% } %>
+        </div>
+
+        <!-- Tên lớp học -->
+        <div class="form-group">
+          <label for="name" class="form-label required">Tên lớp tập huấn</label>
+          <input type="text" id="name" name="name" class="form-control" placeholder="Nhập tên lớp học" value="<%= typeof form_data !== 'undefined' ? form_data.name || '' : '' %>" required>
+          <% if (typeof errors !== 'undefined' && errors.name) { %>
+            <span class="form-error"><%= errors.name %></span>
+          <% } %>
+        </div>
+        
+      </div>
+
+      <!-- Chọn chương trình đào tạo -->
+      <div class="form-group">
+        <label for="program_id" class="form-label required">Chương trình đào tạo tương ứng</label>
+        <select id="program_id" name="program_id" class="form-control" required>
+          <% programs.forEach(function(prog) { %>
+            <option value="<%= prog.id %>" <%= typeof form_data !== 'undefined' && form_data.program_id === prog.id ? 'selected' : '' %>><%= prog.name %> (<%= prog.duration_hours %> giờ)</option>
+          <% }); %>
+        </select>
+        <% if (typeof errors !== 'undefined' && errors.program_id) { %>
+          <span class="form-error"><%= errors.program_id %></span>
+        <% } %>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        
+        <!-- Giảng viên -->
+        <div class="form-group">
+          <label for="instructor" class="form-label required">Giảng viên phụ trách</label>
+          <input type="text" id="instructor" name="instructor" class="form-control" placeholder="Họ tên giảng viên" value="<%= typeof form_data !== 'undefined' ? form_data.instructor || '' : '' %>" required>
+          <% if (typeof errors !== 'undefined' && errors.instructor) { %>
+            <span class="form-error"><%= errors.instructor %></span>
+          <% } %>
+        </div>
+
+        <!-- Đơn vị phối hợp -->
+        <div class="form-group">
+          <label for="coordinating_unit" class="form-label">Đơn vị phối hợp tổ chức</label>
+          <input type="text" id="coordinating_unit" name="coordinating_unit" class="form-control" placeholder="Tên đơn vị, doanh nghiệp đối tác" value="<%= typeof form_data !== 'undefined' ? form_data.coordinating_unit || '' : '' %>">
+        </div>
+        
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        
+        <!-- Ngày bắt đầu -->
+        <div class="form-group">
+          <label for="start_time" class="form-label required">Ngày bắt đầu tổ chức</label>
+          <input type="date" id="start_time" name="start_time" class="form-control" value="<%= typeof form_data !== 'undefined' ? form_data.start_time || '' : '' %>" required>
+          <% if (typeof errors !== 'undefined' && errors.start_time) { %>
+            <span class="form-error"><%= errors.start_time %></span>
+          <% } %>
+        </div>
+
+        <!-- Ngày kết thúc -->
+        <div class="form-group">
+          <label for="end_time" class="form-label required">Ngày kết thúc dự kiến</label>
+          <input type="date" id="end_time" name="end_time" class="form-control" value="<%= typeof form_data !== 'undefined' ? form_data.end_time || '' : '' %>" required>
+          <% if (typeof errors !== 'undefined' && errors.end_time) { %>
+            <span class="form-error"><%= errors.end_time %></span>
+          <% } %>
+        </div>
+        
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        
+        <!-- Địa điểm tổ chức -->
+        <div class="form-group">
+          <label for="location" class="form-label">Địa điểm tổ chức</label>
+          <input type="text" id="location" name="location" class="form-control" placeholder="Ví dụ: Phòng đào tạo VN168, Tầng 3" value="<%= typeof form_data !== 'undefined' ? form_data.location || '' : '' %>">
+        </div>
+
+        <!-- Số lượng học viên dự kiến -->
+        <div class="form-group" style="margin-bottom: 32px;">
+          <label for="expected_trainees" class="form-label">Số lượng học viên dự kiến</label>
+          <input type="number" id="expected_trainees" name="expected_trainees" class="form-control" placeholder="Ví dụ: 30" min="1" value="<%= typeof form_data !== 'undefined' ? form_data.expected_trainees || '' : '' %>">
+        </div>
+        
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%;">Tạo lớp tập huấn</button>
+    </form>
+  </div>
+</div>

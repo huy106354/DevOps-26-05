@@ -1,0 +1,280 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">CRM Mini - Pipeline Bán Hàng</h1>
+    <p class="page-subtitle">Quản lý cơ hội kinh doanh, theo dõi tiến độ chăm sóc khách hàng và doanh số dự kiến.</p>
+  </div>
+</div>
+
+<!-- CRM Navigation Tabs -->
+<div class="tabs-navigation" style="margin-bottom: 24px;">
+  <div class="tab-link active" onclick="switchCrmTab('pipeline')">📊 Phễu bán hàng (Pipeline)</div>
+  <div class="tab-link" onclick="switchCrmTab('directory')">📂 Danh mục khách hàng (<%= customers.length %>)</div>
+</div>
+
+<!-- Tab panels -->
+<div>
+  
+  <!-- TAB 1: PIPELINE BOARD -->
+  <div id="crm-pipeline" class="tab-panel active">
+    
+    <!-- Sales Forecasting Analytics Widgets -->
+    <div class="grid-stats" style="margin-bottom: 24px;">
+      <div class="stat-card" style="padding: 16px 20px;">
+        <div>
+          <div class="stat-label" style="font-size: 11px;">Tổng doanh số Pipeline</div>
+          <div style="font-weight: 800; font-size: 20px; margin-top: 4px; color: var(--primary);">
+            <%= analytics.total_pipeline_value.toLocaleString('vi-VN') %>đ
+          </div>
+        </div>
+      </div>
+      <div class="stat-card" style="padding: 16px 20px;">
+        <div>
+          <div class="stat-label" style="font-size: 11px;">Doanh thu đã chốt (WON)</div>
+          <div style="font-weight: 800; font-size: 20px; margin-top: 4px; color: var(--success);">
+            <%= analytics.total_won_value.toLocaleString('vi-VN') %>đ
+          </div>
+        </div>
+      </div>
+      <div class="stat-card" style="padding: 16px 20px;">
+        <div>
+          <div class="stat-label" style="font-size: 11px;">Doanh số kỳ vọng dự báo (Weighted)</div>
+          <div style="font-weight: 800; font-size: 20px; margin-top: 4px; color: var(--warning-text);">
+            <%= analytics.weighted_forecast_value.toLocaleString('vi-VN') %>đ
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Form to Create New Opportunity -->
+    <div class="panel" style="margin-bottom: 24px;">
+      <div class="panel-header">
+        <h3 class="panel-title">📝 Tạo Cơ hội kinh doanh mới</h3>
+      </div>
+      <div class="panel-body">
+        <form action="/crm/opportunities/create" method="POST" onsubmit="return confirm('Xác nhận tạo cơ hội kinh doanh mới và đưa vào Pipeline?');">
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: flex-end;">
+            
+            <div class="form-group" style="margin: 0;">
+              <label for="customer_id" class="form-label required">Khách hàng tiềm năng</label>
+              <select id="customer_id" name="customer_id" class="form-control" required>
+                <option value="">-- Chọn doanh nghiệp --</option>
+                <% customers.forEach(function(c) { %>
+                  <option value="<%= c.id %>"><%= c.company_name %> (<%= c.customer_code %>)</option>
+                <% }); %>
+              </select>
+            </div>
+            
+            <div class="form-group" style="margin: 0;">
+              <label for="requirements" class="form-label required">Nhu cầu / Sản phẩm giải pháp</label>
+              <input type="text" id="requirements" name="requirements" class="form-control" placeholder="Ví dụ: Triển khai AI Chatbot VN168" required>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label for="expected_value" class="form-label">Doanh thu dự kiến (VND)</label>
+              <input type="number" id="expected_value" name="expected_value" class="form-control" placeholder="Ví dụ: 150000000" min="0">
+            </div>
+            
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: flex-end; margin-top: 16px;">
+            <div class="form-group" style="margin: 0;">
+              <label for="stage" class="form-label required">Giai đoạn Pipeline</label>
+              <select id="stage" name="stage" class="form-control" required>
+                <option value="new">Mới tiếp cận (Lead)</option>
+                <option value="quoted">Đã báo giá (Quoted)</option>
+                <option value="won">Thành công (Won)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label for="probability" class="form-label required">Xác suất thành công (%)</label>
+              <select id="probability" name="probability" class="form-control" required>
+                <option value="10">10%</option>
+                <option value="30">30%</option>
+                <option value="50">50%</option>
+                <option value="70">70%</option>
+                <option value="90">90%</option>
+                <option value="100">100%</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-sm" style="padding: 11px 24px; width: 100%;">📊 Khởi tạo cơ hội</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; overflow-x: auto; padding-bottom: 16px;">
+      
+      <!-- COLUMN 1: NEW -->
+      <div style="background-color: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 2px solid var(--border); padding-bottom: 8px;">
+          <h4 style="font-size: 14px;">Mới tiếp cận 🌟</h4>
+          <span class="badge badge-primary"><%= opportunities.filter(o => o.stage === 'new').length %></span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <% opportunities.filter(o => o.stage === 'new').forEach(function(o) { %>
+            <div style="background-color: var(--bg-tertiary); padding: 12px; border-radius: var(--radius-sm); border-left: 3px solid var(--primary); font-size: 13px;">
+              <div style="font-weight: 700; color: var(--text-primary);"><%= o.customer_id.company_name %></div>
+              <div style="color: var(--text-secondary); margin-top: 4px;"><%= o.requirements %></div>
+              <div style="margin-top: 8px; font-weight: 700; color: var(--primary);"><%= o.expected_value.toLocaleString('vi-VN') %>đ</div>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+
+      <!-- COLUMN 2: QUOTED -->
+      <div style="background-color: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 2px solid var(--border); padding-bottom: 8px;">
+          <h4 style="font-size: 14px;">Đã báo giá 📝</h4>
+          <span class="badge badge-warning"><%= opportunities.filter(o => o.stage === 'quoted').length %></span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <% opportunities.filter(o => o.stage === 'quoted').forEach(function(o) { %>
+            <div style="background-color: var(--bg-tertiary); padding: 12px; border-radius: var(--radius-sm); border-left: 3px solid var(--warning); font-size: 13px;">
+              <div style="font-weight: 700; color: var(--text-primary);"><%= o.customer_id.company_name %></div>
+              <div style="color: var(--text-secondary); margin-top: 4px;"><%= o.requirements %></div>
+              <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 700; color: var(--warning-text);"><%= o.expected_value.toLocaleString('vi-VN') %>đ</span>
+                <span class="badge badge-warning" style="font-size: 9px;"><%= o.probability %>%</span>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+
+      <!-- COLUMN 3: WON -->
+      <div style="background-color: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 2px solid var(--border); padding-bottom: 8px;">
+          <h4 style="font-size: 14px;">Thành công (Won) ✔️</h4>
+          <span class="badge badge-success"><%= opportunities.filter(o => o.stage === 'won').length %></span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <% opportunities.filter(o => o.stage === 'won').forEach(function(o) { %>
+            <div style="background-color: var(--bg-tertiary); padding: 12px; border-radius: var(--radius-sm); border-left: 3px solid var(--success); font-size: 13px;">
+              <div style="font-weight: 700; color: var(--text-primary);"><%= o.customer_id.company_name %></div>
+              <div style="color: var(--text-secondary); margin-top: 4px;"><%= o.requirements %></div>
+              <div style="margin-top: 8px; font-weight: 700; color: var(--success);"><%= o.expected_value.toLocaleString('vi-VN') %>đ</div>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  <!-- TAB 2: CUSTOMERS DIRECTORY -->
+  <div id="crm-directory" class="tab-panel">
+    
+    <!-- Form to Create New Customer -->
+    <div class="panel" style="margin-bottom: 24px;">
+      <div class="panel-header" style="background-color: var(--success-bg); border-bottom-color: rgba(16,185,129,0.25);">
+        <h3 class="panel-title" style="color: var(--success-text);">➕ Thêm Khách hàng Potentials mới</h3>
+      </div>
+      <div class="panel-body">
+        <form action="/crm/customers/create" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn lưu khách hàng mới này vào hệ thống?');">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: flex-end;">
+            
+            <div class="form-group" style="margin: 0;">
+              <label for="customer_code" class="form-label required">Mã khách hàng</label>
+              <input type="text" id="customer_code" name="customer_code" class="form-control" placeholder="Ví dụ: KH-DNG" required>
+            </div>
+            
+            <div class="form-group" style="margin: 0;">
+              <label for="company_name" class="form-label required">Tên doanh nghiệp / Đơn vị</label>
+              <input type="text" id="company_name" name="company_name" class="form-control" placeholder="Tên công ty khách hàng" required>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label for="industry" class="form-label">Lĩnh vực hoạt động</label>
+              <input type="text" id="industry" name="industry" class="form-control" placeholder="Ví dụ: Viễn thông, Công nghệ">
+            </div>
+            
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; align-items: flex-end; margin-top: 16px;">
+            <div class="form-group" style="margin: 0;">
+              <label for="address" class="form-label">Địa chỉ liên hệ</label>
+              <input type="text" id="address" name="address" class="form-control" placeholder="Địa chỉ giao dịch">
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label for="province_city" class="form-label">Tỉnh / Thành</label>
+              <input type="text" id="province_city" name="province_city" class="form-control" value="Đắk Lắk">
+            </div>
+
+            <button type="submit" class="btn btn-success btn-sm" style="padding: 11px 24px; width: 100%;">➕ Lưu khách hàng</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h3 class="panel-title">Danh sách Khách hàng Potentials</h3>
+      </div>
+      <div class="panel-body" style="padding: 0;">
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Mã KH</th>
+                <th>Tên công ty / Đơn vị</th>
+                <th>Lĩnh vực hoạt động</th>
+                <th>Địa chỉ liên hệ</th>
+                <th>Tỉnh/Thành</th>
+                <th>Người phụ trách VN168</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% customers.forEach(function(c) { %>
+                <tr>
+                  <td style="font-family: monospace; font-weight: 700; color: var(--primary);"><%= c.customer_code %></td>
+                  <td style="font-weight: 600;">
+                    <%= c.company_name %>
+                    <% if (c.tier === 'gold') { %>
+                      <span class="badge badge-warning" style="font-size: 9px; padding: 2px 6px; margin-left: 4px; box-shadow: 0 2px 6px rgba(245,158,11,0.2);">VÀNG 🏆</span>
+                    <% } else if (c.tier === 'silver') { %>
+                      <span class="badge badge-secondary" style="font-size: 9px; padding: 2px 6px; margin-left: 4px; background-color: #94a3b8; color: white;">BẠC 🥈</span>
+                    <% } %>
+                  </td>
+                  <td><%= c.industry || 'N/A' %></td>
+                  <td><%= c.address || 'N/A' %></td>
+                  <td><%= c.province_city %></td>
+                  <td style="font-weight: 500;"><%= c.owner_id ? c.owner_id.full_name : 'Chưa gán' %></td>
+                  <td>
+                    <% if (c.status === 'active') { %>
+                      <span class="badge badge-success">Khách hàng chính thức</span>
+                    <% } else if (c.status === 'prospect') { %>
+                      <span class="badge badge-warning">Khách hàng tiềm năng</span>
+                    <% } else if (c.status === 'lead') { %>
+                      <span class="badge badge-primary">Mới tiếp cận</span>
+                    <% } else { %>
+                      <span class="badge badge-danger">Không hoạt động</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  
+</div>
+
+<script>
+  function switchCrmTab(tabName) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+    
+    document.getElementById(`crm-${tabName}`).classList.add('active');
+    const links = document.querySelectorAll('.tab-link');
+    if (tabName === 'pipeline') links[0].classList.add('active');
+    else if (tabName === 'directory') links[1].classList.add('active');
+  }
+</script>

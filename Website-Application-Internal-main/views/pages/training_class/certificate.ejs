@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chứng Nhận Đào Tạo Số - VN168</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Montserrat:wght@400;500;600;700&display=swap');
+
+    body {
+      background-color: #f1f5f9;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .certificate-border {
+      width: 900px;
+      height: 620px;
+      background-color: #ffffff;
+      padding: 30px;
+      border: 20px solid #ffffff;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      position: relative;
+      background-image: radial-gradient(circle, rgba(212, 175, 55, 0.03) 1px, transparent 1px);
+      background-size: 20px 20px;
+      box-sizing: border-box;
+    }
+
+    .certificate-border::before {
+      content: '';
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      border: 3px double #d4af37;
+    }
+
+    .certificate-container {
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      height: 100%;
+      padding: 40px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+      position: relative;
+    }
+
+    .national-brand {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: #334155;
+    }
+
+    .national-brand-sub {
+      font-size: 10px;
+      color: #64748b;
+      margin-top: 4px;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 8px;
+      width: 160px;
+    }
+
+    .corp-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1e3a8a;
+      letter-spacing: 0.1em;
+      margin-top: 16px;
+    }
+
+    .cert-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 38px;
+      font-weight: 700;
+      color: #d4af37;
+      margin: 12px 0;
+      letter-spacing: 0.05em;
+    }
+
+    .cert-text {
+      font-size: 14px;
+      color: #475569;
+      line-height: 1.6;
+    }
+
+    .trainee-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 12px 0;
+      border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+      display: inline-block;
+      padding-bottom: 4px;
+      width: 80%;
+    }
+
+    .class-name {
+      font-weight: 700;
+      color: #1e3a8a;
+    }
+
+    .footer-block {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      align-items: flex-end;
+      margin-top: 20px;
+    }
+
+    .signature-area {
+      text-align: center;
+      width: 250px;
+    }
+
+    .signature-title {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 48px;
+    }
+
+    .signature-name {
+      font-weight: 700;
+      font-size: 13px;
+      color: #1e293b;
+    }
+
+    .qr-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .cert-code {
+      font-family: monospace;
+      font-size: 10px;
+      color: #64748b;
+    }
+
+    .btn-print {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+      z-index: 100;
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background-color: white;
+        padding: 0;
+        margin: 0;
+      }
+      .btn-print {
+        display: none;
+      }
+      .certificate-border {
+        box-shadow: none;
+        width: 100%;
+        height: 100vh;
+        border: none;
+        padding: 0;
+      }
+      .certificate-border::before {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Print Button -->
+  <button class="btn-print" onclick="window.print()">🖨️ In chứng nhận</button>
+
+  <div class="certificate-border">
+    <div class="certificate-container">
+      
+      <!-- Country Brand Header -->
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="national-brand">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+        <div class="national-brand-sub">Độc lập - Tự do - Hạnh phúc</div>
+        <div class="corp-title">CÔNG TY CỔ PHẦN CÔNG NGHỆ VN168</div>
+      </div>
+
+      <!-- Main Cert Banner -->
+      <div>
+        <div class="cert-heading">CHỨNG NHẬN ĐÀO TẠO</div>
+        <div class="cert-text">Hội đồng khoa học và đào tạo VN168 chứng nhận:</div>
+        <div class="trainee-name"><%= certificate.trainee_id.full_name %></div>
+        <div class="cert-text" style="width: 600px; margin: 0 auto;">
+          Đã hoàn thành xuất sắc khóa huấn luyện nghiệp vụ chuyên đề:
+          <br>
+          <span class="class-name">“<%= certificate.class_id.name %>”</span>
+          <br>
+          do Học viện Công nghệ VN168 phối hợp tổ chức và giảng dạy.
+        </div>
+      </div>
+
+      <!-- Signatures & Verification Details -->
+      <div class="footer-block">
+        
+        <!-- Verification QR & Code -->
+        <div class="qr-area">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=<%= encodeURIComponent(certificate.certificate_code) %>" alt="QR Verification" width="70" height="70">
+          <div>
+            <div style="font-weight: 700; font-size: 11px; color: #1e3a8a; margin-bottom: 2px;">XÁC THỰC SỐ</div>
+            <div class="cert-code">Mã số: <%= certificate.certificate_code %></div>
+            <div class="cert-code" style="margin-top: 2px;">Ngày cấp: <%= new Date(certificate.issue_date).toLocaleDateString('vi-VN') %></div>
+          </div>
+        </div>
+
+        <!-- Director Signature -->
+        <div class="signature-area">
+          <div class="signature-title">GIÁM ĐỐC ĐÀO TẠO</div>
+          <!-- Mock stamp/signature layout -->
+          <div style="font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: #ef4444; margin-bottom: 8px; transform: rotate(-5deg); border: 2px dashed #ef4444; padding: 4px; display: inline-block;">
+            ĐÃ KÝ DUYỆT SỐ
+          </div>
+          <div class="signature-name">Hội đồng Đào tạo VN168</div>
+        </div>
+        
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

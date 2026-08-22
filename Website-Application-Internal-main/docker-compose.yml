@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # Phân hệ Cơ sở dữ liệu: PostgreSQL 17 Alpine
+  db:
+    image: postgres:17-alpine
+    container_name: vn168_postgres_17
+    restart: always
+    environment:
+      POSTGRES_DB: vn168_internal_db
+      POSTGRES_USER: vn168_user
+      POSTGRES_PASSWORD: vn168_secure_pass_2026
+    ports:
+      - "5426:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # Phân hệ Cache hiệu năng cao: Redis 7 Alpine
+  cache:
+    image: redis:7-alpine
+    container_name: vn168_redis_cache
+    restart: always
+    ports:
+      - "6376:6379"
+
+  # Phân hệ Web Application: SailsJS (Chạy Node.js 24 Alpine)
+  web:
+    build: .
+    container_name: vn168_web_app
+    restart: always
+    ports:
+      - "1337:1337"
+    environment:
+      - NODE_ENV=production
+      - DB_ADAPTER=sails-postgresql
+      - DATABASE_URL=postgresql://vn168_user:vn168_secure_pass_2026@db:5432/vn168_internal_db
+      - REDIS_URL=redis://cache:6379
+      - MIGRATE=alter
+    depends_on:
+      - db
+      - cache
+
+volumes:
+  pgdata:
+    driver: local

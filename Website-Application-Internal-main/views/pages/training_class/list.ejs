@@ -1,0 +1,130 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Quản lý Lớp tập huấn</h1>
+    <p class="page-subtitle">Quản lý danh sách lớp học, import học viên, điểm danh QR và cấp chứng nhận.</p>
+  </div>
+  <% if (current_user.roles.includes('admin') || current_user.roles.includes('training')) { %>
+    <a href="/training/classes/create" class="btn btn-primary">
+      <span>➕</span> Tạo lớp tập huấn mới
+    </a>
+  <% } %>
+</div>
+
+<!-- Filters Bar -->
+<div class="panel" style="margin-bottom: 24px;">
+  <form action="/training/classes" method="GET" class="filter-bar">
+    <div class="filter-item">
+      <span>🔍</span>
+      <input type="text" name="keyword" placeholder="Nhập tên lớp, mã lớp, giảng viên..." value="<%= filters.keyword %>">
+    </div>
+    
+    <div class="filter-item">
+      <label for="status">Trạng thái:</label>
+      <select id="status" name="status">
+        <option value="">-- Tất cả --</option>
+        <option value="draft" <%= filters.status === 'draft' ? 'selected' : '' %>>Bản nháp</option>
+        <option value="scheduled" <%= filters.status === 'scheduled' ? 'selected' : '' %>>Lên lịch</option>
+        <option value="ongoing" <%= filters.status === 'ongoing' ? 'selected' : '' %>>Đang diễn ra</option>
+        <option value="completed" <%= filters.status === 'completed' ? 'selected' : '' %>>Hoàn thành</option>
+        <option value="cancelled" <%= filters.status === 'cancelled' ? 'selected' : '' %>>Hủy bỏ</option>
+      </select>
+    </div>
+    
+    <button type="submit" class="btn btn-secondary btn-sm">Tìm kiếm</button>
+    <a href="/training/classes" class="btn btn-secondary btn-sm" style="padding: 8px 12px;">Reset</a>
+  </form>
+</div>
+
+<!-- Classes Table Panel -->
+<div class="panel">
+  <div class="panel-body" style="padding: 0;">
+    <% if (classes.length === 0) { %>
+      <div style="padding: 48px; text-align: center; color: var(--text-muted);">
+        <div style="font-size: 40px; margin-bottom: 12px;">🏫</div>
+        <h3>Không tìm thấy lớp học nào</h3>
+        <p style="margin-top: 8px;">Vui lòng điều chỉnh bộ lọc hoặc thêm lớp tập huấn mới.</p>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Mã lớp</th>
+              <th>Tên lớp học</th>
+              <th>Chương trình đào tạo</th>
+              <th>Giảng viên</th>
+              <th>Thời gian tổ chức</th>
+              <th>Đơn vị phối hợp</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% classes.forEach(function(item) { %>
+              <tr>
+                <td style="font-weight: 700; font-family: monospace; color: var(--primary);">
+                  <%= item.class_code %>
+                </td>
+                <td style="font-weight: 600;">
+                  <a href="/training/classes/<%= item.id %>"><%= item.name %></a>
+                </td>
+                <td>
+                  <%= item.program_id ? item.program_id.name : 'N/A' %>
+                </td>
+                <td style="font-weight: 500;">
+                  <%= item.instructor %>
+                </td>
+                <td style="font-size: 13px; color: var(--text-secondary);">
+                  <%= new Date(item.start_time).toLocaleDateString('vi-VN') %> - <%= new Date(item.end_time).toLocaleDateString('vi-VN') %>
+                </td>
+                <td>
+                  <%= item.coordinating_unit || 'N/A' %>
+                </td>
+                <td>
+                  <% if (item.status === 'scheduled') { %>
+                    <span class="badge badge-primary">Lên lịch</span>
+                  <% } else if (item.status === 'ongoing') { %>
+                    <span class="badge badge-success">Đang học</span>
+                  <% } else if (item.status === 'completed') { %>
+                    <span class="badge badge-success" style="opacity: 0.8;">Hoàn thành</span>
+                  <% } else if (item.status === 'draft') { %>
+                    <span class="badge badge-info">Bản nháp</span>
+                  <% } else { %>
+                    <span class="badge badge-danger">Đã hủy</span>
+                  <% } %>
+                </td>
+                <td>
+                  <div class="actions-cell">
+                    <a href="/training/classes/<%= item.id %>" class="btn btn-secondary btn-sm" style="padding: 6px 12px; font-size: 12px;">
+                      Chi tiết ➔
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Pagination Bar -->
+      <% if (pagination.total_pages > 1) { %>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-top: 1px solid var(--border); background-color: var(--bg-tertiary);">
+          <div style="font-size: 13px; color: var(--text-secondary); font-weight: 500;">
+            Hiển thị <strong><%= classes.length %></strong> trên tổng số <strong><%= pagination.total_count %></strong> lớp học.
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <% if (pagination.page > 1) { %>
+              <a href="/training/classes?page=<%= pagination.page - 1 %>&keyword=<%= filters.keyword %>&status=<%= filters.status %>" class="btn btn-secondary btn-sm" style="padding: 6px 12px;">⬅️ Trước</a>
+            <% } %>
+            <span style="font-size: 13px; font-weight: 700; padding: 0 8px; color: var(--text-primary);">
+              Trang <%= pagination.page %> / <%= pagination.total_pages %>
+            </span>
+            <% if (pagination.page < pagination.total_pages) { %>
+              <a href="/training/classes?page=<%= pagination.page + 1 %>&keyword=<%= filters.keyword %>&status=<%= filters.status %>" class="btn btn-secondary btn-sm" style="padding: 6px 12px;">Sau ➡️</a>
+            <% } %>
+          </div>
+        </div>
+      <% } %>
+    <% } %>
+  </div>
+</div>
