@@ -1,8 +1,4 @@
-# HƯỚNG DẪN KHỞI CHẠY ỨNG DỤNG VN168 INTERNAL WEB APP
 
-Tài liệu này hướng dẫn chi tiết cách thiết lập và khởi chạy ứng dụng Quản trị Nội bộ VN168 bằng phương pháp thủ công (Manual) và Docker.
-
----
 
 ## 🛠️ PHƯƠNG PHÁP 1: KHỞI CHẠY THỦ CÔNG (MANUAL STARTUP)
 
@@ -75,3 +71,6 @@ Hệ thống hỗ trợ nạp cấu hình linh hoạt thông qua các biến mô
 - `DATABASE_URL`: Đường dẫn kết nối CSDL PostgreSQL (Ví dụ: `postgresql://postgres:vn168_secret_password@db:5432/vn168_internal_db`).
 - `REDIS_URL`: Đường dẫn kết nối Cache Redis (Ví dụ: `redis://cache:6379`).
 - `PORT`: Cổng khởi chạy ứng dụng web. Mặc định `1337`.
+
+BTVN 1
+ ![Screenshot](/assets/images/image.png)
