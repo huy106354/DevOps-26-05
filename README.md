@@ -1,4 +1,4 @@
-# HƯỚNG DẪN KHỞI CHẠY ỨNG DỤNG VN168 INTERNAL WEB APP
+# HƯỚNG DẪN KHỞI CHẠY ỨNG DỤNG 
 
 Tài liệu này hướng dẫn chi tiết cách thiết lập và khởi chạy ứng dụng Quản trị Nội bộ VN168 bằng phương pháp thủ công (Manual) và Docker.
 
