@@ -41,8 +41,8 @@ pipeline {
     CACHE_TAG = "${REGISTRY}/${IMAGE_NAME}:buildcache"
 
     // Cổng stack deploy thật (khác cổng smoke test 3999/55999 để không đụng nhau)
-    DEPLOY_WEB_PORT = '3000'
-    DEPLOY_DB_PORT  = '3306'
+    DEPLOY_WEB_PORT = '1337'
+    DEPLOY_DB_PORT  = '5426'
     DEPLOY_PROJECT  = 'dictionary-prod'
   }
 
@@ -209,14 +209,13 @@ pipeline {
           "IMAGE_TAG=${env.TAG_SHA}",
           "WEB_PORT=${DEPLOY_WEB_PORT}",
           "DB_PORT=${DEPLOY_DB_PORT}",
-          "MYSQL_USER=root",
-          "MYSQL_PASSWORD=",
-          "MYSQL_DATABASE=news",
-          "MYSQL_ROOT_PASSWORD=root"
+          "POSTGRES_USER=vn168_user",
+          "POSTGRES_PASSWORD=vn168_secure_pass_2026",
+          "POSTGRES_DB=vn168_internal_db"
         ]) {
           sh """
             docker compose -p ${DEPLOY_PROJECT} \
-              -f docker-compose.yml -f docker-compose.prod.yml \
+              -f docker-compose.yml \
               up -d --remove-orphans
           """
         }
@@ -258,9 +257,9 @@ pipeline {
 
       Rollback về bản trước (thay <sha_cũ>):
         IMAGE_TAG=${IMAGE}:<sha_cũ> WEB_PORT=${DEPLOY_WEB_PORT} DB_PORT=${DEPLOY_DB_PORT} \\
-        MYSQL_USER=dictuser MYSQL_PASSWORD=dictpass MYSQL_DATABASE=dictionary MYSQL_ROOT_PASSWORD=rootpass \\
+        POSTGRES_USER=vn168_user POSTGRES_PASSWORD=vn168_secure_pass_2026 POSTGRES_DB=vn168_internal_db \\
         docker compose -p ${DEPLOY_PROJECT} \\
-          -f docker-compose.yml -f docker-compose.prod.yml up -d
+          -f docker-compose.yml up -d
       =====================================================
       """
     }
