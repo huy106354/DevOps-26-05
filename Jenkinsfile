@@ -23,7 +23,7 @@ pipeline {
   environment {
     REGISTRY   = 'ghcr.io'
     // ĐỔI thành tài khoản GitHub của bạn (BẮT BUỘC viết thường)
-    IMAGE_NAME = 'huy106354/DevOps-26-05'
+    IMAGE_NAME = 'huy106354/devops-26-05'
     IMAGE      = "${REGISTRY}/${IMAGE_NAME}"
 
     // Credential kiểu "Username with password":
