@@ -1,0 +1,60 @@
+<%
+  // Simple helper to check if path matches current module
+  const current_path = typeof req !== 'undefined' ? req.path : '';
+  const is_active = (path) => current_path.startsWith(path) ? 'active' : '';
+%>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-text">VN168</span>
+    <span class="logo-badge">PRO</span>
+  </div>
+  
+  <nav class="sidebar-nav">
+    <a href="/dashboard" class="nav-item <%= current_path === '/dashboard' || current_path === '/' ? 'active' : '' %>">
+      <div class="nav-icon">📊</div>
+      <span>Tổng quan</span>
+    </a>
+    
+    <a href="/training/classes" class="nav-item <%= is_active('/training') %>">
+      <div class="nav-icon">🏫</div>
+      <span>Quản lý tập huấn</span>
+    </a>
+    
+    <a href="/documents" class="nav-item <%= is_active('/documents') %>">
+      <div class="nav-icon">📄</div>
+      <span>Quản lý công văn</span>
+    </a>
+    
+    <a href="/crm/customers" class="nav-item <%= is_active('/crm') %>">
+      <div class="nav-icon">💼</div>
+      <span>CRM Mini</span>
+    </a>
+    
+    <a href="/assets/items" class="nav-item <%= is_active('/assets') %>">
+      <div class="nav-icon">🛡️</div>
+      <span>Quản lý tài sản</span>
+    </a>
+    
+    <% if (typeof current_user !== 'undefined' && current_user.roles && current_user.roles.includes('admin')) { %>
+      <a href="/admin/system" class="nav-item <%= is_active('/admin') %>" style="border-top: 1px dashed var(--border); margin-top: 12px; padding-top: 16px; border-radius: 0 0 var(--radius-md) var(--radius-md);">
+        <div class="nav-icon">⚙️</div>
+        <span>Quản trị hệ thống</span>
+      </a>
+    <% } %>
+  </nav>
+  
+  <div class="sidebar-footer">
+    <div class="avatar">
+      <%= typeof current_user !== 'undefined' ? current_user.full_name.charAt(0).toUpperCase() : 'U' %>
+    </div>
+    <div class="user-info">
+      <div class="user-name"><%= typeof current_user !== 'undefined' ? current_user.full_name : 'Người dùng' %></div>
+      <div class="user-role">
+        <%= typeof current_user !== 'undefined' && current_user.roles ? current_user.roles.join(', ') : 'Nhân viên' %>
+      </div>
+    </div>
+    <a href="/auth/logout" class="btn-logout" title="Đăng xuất">
+      <span>🚪</span>
+    </a>
+  </div>
+</aside>

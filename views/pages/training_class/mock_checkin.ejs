@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Điểm danh lớp tập huấn - VN168</title>
+  <link rel="stylesheet" href="/styles/main.css">
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .mobile-card {
+      width: 100%;
+      max-width: 400px;
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 20px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .checkin-success-icon {
+      width: 72px;
+      height: 72px;
+      background-color: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 20px auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mobile-card">
+    
+    <div style="font-size: 11px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+      📲 QUÉT ĐIỂM DANH QR (VN168)
+    </div>
+    
+    <h2 style="font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 6px; line-height: 1.3;">
+      <%= session.class_id.name %>
+    </h2>
+    <p style="color: #94a3b8; font-size: 13px; margin-bottom: 24px;">
+      Buổi: <%= session.session_date %>
+    </p>
+
+    <!-- Success checkin display -->
+    <% if (success_checkin) { %>
+      
+      <div class="checkin-success-icon">✔️</div>
+      <h3 style="font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700; color: #10b981;">Điểm danh thành công!</h3>
+      <p style="color: #cbd5e1; font-size: 14px; margin-top: 8px; line-height: 1.4;">
+        Chào <strong><%= trainee_name %></strong>, hệ thống đã ghi nhận sự tham dự của bạn một cách hợp lệ vào lúc <%= new Date().toLocaleTimeString('vi-VN') %>.
+      </p>
+      
+      <div style="margin-top: 32px; font-size: 11px; color: #64748b;">
+        Bạn có thể đóng trình duyệt này ngay bây giờ.
+      </div>
+
+    <% } else { %>
+
+      <!-- Error box if any -->
+      <% if (error_message) { %>
+        <div class="alert alert-danger" style="text-align: left; margin-bottom: 20px; background-color: rgba(239, 68, 68, 0.1); border-color: #ef4444; color: #fca5a5;">
+          <span>⚠️</span>
+          <div style="font-size: 13px;"><%= error_message %></div>
+        </div>
+      <% } %>
+
+      <% if (is_expired) { %>
+        <div style="padding: 24px 16px; background-color: rgba(239, 68, 68, 0.1); border-radius: 12px; border: 1px dashed #ef4444; margin-bottom: 24px;">
+          <div style="font-size: 32px; margin-bottom: 8px;">⏳</div>
+          <h4 style="color: #fca5a5; font-size: 15px;">Mã QR đã hết hạn hiệu lực</h4>
+          <p style="color: #94a3b8; font-size: 12px; margin-top: 4px; line-height: 1.4;">
+            Thời gian điểm danh QR chỉ kéo dài trong vòng 15 phút kể từ lúc mở. Vui lòng liên hệ cán bộ đào tạo mở lại.
+          </p>
+        </div>
+      <% } else { %>
+        
+        <form action="/attendance/<%= session.id %>/checkin?token=<%= session.qr_token %>" method="POST" style="text-align: left;">
+          
+          <div class="form-group">
+            <label for="trainee_id" class="form-label required" style="color: #cbd5e1;">Xác nhận danh tính học viên</label>
+            <select id="trainee_id" name="trainee_id" class="form-control" style="background-color: #0f172a; border-color: #334155; color: #f8fafc;" required>
+              <option value="">-- Chọn tên của bạn --</option>
+              <% trainees.forEach(function(trainee) { %>
+                <option value="<%= trainee.id %>"><%= trainee.full_name %> (<%= trainee.unit || 'Đơn vị tự do' %>)</option>
+              <% }); %>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px; background-color: #2563eb; font-weight: 700;">Gửi Điểm Danh</button>
+        </form>
+
+      <% } %>
+
+    <% } %>
+
+  </div>
+
+</body>
+</html>

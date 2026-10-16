@@ -1,0 +1,25 @@
+<header class="header">
+  <div class="header-search">
+    <span>🔍</span>
+    <input type="text" placeholder="Tìm kiếm nhanh hồ sơ, học viên, công văn..." aria-label="Tìm kiếm nhanh">
+  </div>
+  
+  <div class="header-actions">
+    <!-- Theme Switcher -->
+    <button class="action-btn" onclick="toggleTheme()" title="Đổi giao diện Sáng/Tối">
+      <span>🌓</span>
+    </button>
+    
+    <!-- Notification Bell -->
+    <button class="action-btn" title="Thông báo hệ thống">
+      <span>🔔</span>
+      <span class="badge-dot"></span>
+    </button>
+    
+    <!-- Date View -->
+    <div style="font-size: 13px; color: var(--text-secondary); font-weight: 500; display: flex; align-items: center; gap: 6px;">
+      <span>📅</span>
+      <span><%= new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+    </div>
+  </div>
+</header>

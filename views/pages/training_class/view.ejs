@@ -1,0 +1,321 @@
+<div class="page-header">
+  <div>
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+      <span class="badge badge-primary" style="font-family: monospace; font-size: 13px;"><%= class_record.class_code %></span>
+      <h1 class="page-title" style="margin: 0;"><%= class_record.name %></h1>
+    </div>
+    <p class="page-subtitle">Giảng viên: <strong><%= class_record.instructor %></strong> | Địa điểm: <strong><%= class_record.location || 'N/A' %></strong></p>
+  </div>
+  <a href="/training/classes" class="btn btn-secondary">
+    ➔ Danh sách lớp
+  </a>
+</div>
+
+<!-- Class Profile Dashboard Stats -->
+<div class="grid-stats" style="margin-bottom: 28px;">
+  <div class="stat-card" style="padding: 16px 20px;">
+    <div>
+      <div class="stat-label" style="font-size: 11px;">Thời gian tổ chức</div>
+      <div style="font-weight: 700; font-size: 14px; margin-top: 4px;">
+        <%= new Date(class_record.start_time).toLocaleDateString('vi-VN') %> - <%= new Date(class_record.end_time).toLocaleDateString('vi-VN') %>
+      </div>
+    </div>
+  </div>
+  <div class="stat-card" style="padding: 16px 20px;">
+    <div>
+      <div class="stat-label" style="font-size: 11px;">Đơn vị phối hợp</div>
+      <div style="font-weight: 700; font-size: 14px; margin-top: 4px;"><%= class_record.coordinating_unit || 'Không' %></div>
+    </div>
+  </div>
+  <div class="stat-card" style="padding: 16px 20px;">
+    <div>
+      <div class="stat-label" style="font-size: 11px;">Số học viên</div>
+      <div style="font-weight: 700; font-size: 18px; margin-top: 4px; color: var(--primary);"><%= trainees.length %> học viên</div>
+    </div>
+  </div>
+  <div class="stat-card" style="padding: 16px 20px;">
+    <div>
+      <div class="stat-label" style="font-size: 11px;">Buổi học đã mở</div>
+      <div style="font-weight: 700; font-size: 18px; margin-top: 4px; color: var(--success);"><%= total_sessions %> buổi</div>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs Navigation -->
+<div class="tabs-navigation">
+  <div class="tab-link active" onclick="switchTab('trainees')">👨‍🎓 Học viên (<%= trainees.length %>)</div>
+  <div class="tab-link" onclick="switchTab('attendance')">📅 Điểm danh QR</div>
+  <div class="tab-link" onclick="switchTab('certificates')">📜 Chứng nhận cấp phát (<%= certificates.length %>)</div>
+</div>
+
+<!-- Tab panels -->
+<div>
+  
+  <!-- TAB 01: TRAINEES LIST -->
+  <div id="tab-trainees" class="tab-panel active">
+    
+    <!-- Actions and Import Simulation Panel -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-bottom: 24px;">
+      
+      <!-- Import excel simulation tool -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title">📥 Nhập danh sách học viên từ Excel (Simulated)</h3>
+        </div>
+        <div class="panel-body">
+          <form action="/training/classes/<%= class_record.id %>/import-trainees" method="POST">
+            <div class="form-group">
+              <label for="import_data" class="form-label required">Nhập thông tin học viên dạng CSV</label>
+              <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                Định dạng: <code>Họ tên, Đơn vị, Chức vụ, Số điện thoại, Email, Nhóm đối tượng</code> (Nhập mỗi học viên trên một dòng)
+              </div>
+              <textarea id="import_data" name="import_data" class="form-control" rows="4" placeholder="Nguyễn Văn A, VN168, Kỹ sư, 0987654321, vana@vn168.com, Nhóm A&#10;Trần Thị B, Tech Co, Chuyên viên, 0912345678, thib@tech.com, Nhóm B" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-success btn-sm">📁 Tiến hành Import dữ liệu</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Quick stats evaluation -->
+      <div class="panel" style="display: flex; flex-direction: column; justify-content: center; padding: 24px; text-align: center; background-color: var(--primary-glow); border-color: var(--primary);">
+        <h3 style="font-size: 16px; margin-bottom: 12px;">Xét duyệt chứng nhận</h3>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+          Tự động đánh giá chuyên cần và cấp chứng nhận cho học viên có tỷ lệ tham dự đạt từ <strong>80% trở lên</strong>.
+        </p>
+        <a href="/training/classes/<%= class_record.id %>/certificates/generate" class="btn btn-primary btn-sm" style="width: 100%;" onclick="return confirm('Bạn có chắc chắn muốn tiến hành tự động xét duyệt và cấp chứng nhận đào tạo cho các học viên đạt tiêu chuẩn (chuyên cần >= 80%)?');">
+          🎓 Tự động xét duyệt cấp phát
+        </a>
+      </div>
+      
+    </div>
+
+    <!-- Trainees Table -->
+    <div class="panel">
+      <div class="panel-header">
+        <h3 class="panel-title">Danh sách học viên lớp học</h3>
+      </div>
+      <div class="panel-body" style="padding: 0;">
+        <% if (trainees.length === 0) { %>
+          <div style="padding: 32px; text-align: center; color: var(--text-muted);">
+            Chưa có học viên nào trong lớp này. Hãy sử dụng bảng Import phía trên để thêm học viên!
+          </div>
+        <% } else { %>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Họ và tên</th>
+                  <th>Đơn vị công tác</th>
+                  <th>Chức vụ</th>
+                  <th>Số điện thoại</th>
+                  <th>Email</th>
+                  <th>Tỷ lệ chuyên cần</th>
+                  <th>Trạng thái xét duyệt</th>
+                  <th>Chứng nhận</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% trainees.forEach(function(trainee) { %>
+                  <tr>
+                    <td style="font-weight: 600;"><%= trainee.full_name %></td>
+                    <td><%= trainee.unit || 'N/A' %></td>
+                    <td><%= trainee.position || 'N/A' %></td>
+                    <td style="font-family: monospace;"><%= trainee.phone %></td>
+                    <td><%= trainee.email %></td>
+                    <td style="font-weight: 700;">
+                      <span style="color: <%= trainee.attendance_rate >= 80 ? 'var(--success)' : 'var(--danger)' %>">
+                        <%= trainee.attendance_rate %>% 
+                      </span>
+                      <small style="color: var(--text-muted); font-weight: normal;">(<%= trainee.valid_checkins %>/<%= total_sessions %>)</small>
+                    </td>
+                    <td>
+                      <% if (trainee.status === 'passed') { %>
+                        <span class="badge badge-success">Đạt (Passed)</span>
+                      <% } else if (trainee.status === 'failed') { %>
+                        <span class="badge badge-danger">Không đạt</span>
+                      <% } else { %>
+                        <span class="badge badge-warning">Đang học</span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <% if (trainee.has_certificate) { %>
+                        <a href="/attendance/certificates/view?code=<%= trainee.certificate_code %>" target="_blank" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 11px;">
+                          📜 Xem/In
+                        </a>
+                      <% } else { %>
+                        <span style="color: var(--text-muted); font-size: 12px;">Chưa cấp</span>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+    </div>
+    
+  </div>
+  
+  <!-- TAB 02: ATTENDANCE SESSIONS -->
+  <div id="tab-attendance" class="tab-panel">
+    
+    <!-- Open Attendance Session Form -->
+    <div class="panel" style="max-width: 560px; margin-bottom: 28px;">
+      <div class="panel-header">
+        <h3 class="panel-title">Mở buổi điểm danh QR mới</h3>
+      </div>
+      <div class="panel-body">
+        <form action="/training/classes/<%= class_record.id %>/attendance/open" method="POST" style="display: flex; gap: 16px; align-items: flex-end;">
+          <div class="form-group" style="flex: 2; margin: 0;">
+            <label for="session_date" class="form-label required">Tên buổi / Ngày học</label>
+            <input type="text" id="session_date" name="session_date" class="form-control" value="Buổi học ngày <%= new Date().toLocaleDateString('vi-VN') %>" required>
+          </div>
+          <div class="form-group" style="flex: 1; margin: 0;">
+            <label for="duration" class="form-label required">Thời gian mở QR</label>
+            <select id="duration" name="duration" class="form-control" required>
+              <option value="5">5 phút</option>
+              <option value="15" selected>15 phút</option>
+              <option value="30">30 phút</option>
+              <option value="60">60 phút</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" style="padding: 10px 20px; font-size: 13px;">Sinh QR & Mở</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Attendance Sessions List -->
+    <div class="panel">
+      <div class="panel-header">
+        <h3 class="panel-title">Các buổi điểm danh đã mở</h3>
+      </div>
+      <div class="panel-body" style="padding: 0;">
+        <% if (sessions.length === 0) { %>
+          <div style="padding: 32px; text-align: center; color: var(--text-muted);">
+            Chưa có buổi điểm danh nào được mở cho lớp này. Hãy điền form phía trên để khởi động buổi học đầu tiên!
+          </div>
+        <% } else { %>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Tên buổi điểm danh</th>
+                  <th>Giờ bắt đầu</th>
+                  <th>Giờ hết hạn</th>
+                  <th>Trạng thái</th>
+                  <th>Mã QR</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% sessions.forEach(function(sess) { %>
+                  <% 
+                    const is_currently_open = Date.now() < sess.end_time && sess.status === 'open'; 
+                  %>
+                  <tr>
+                    <td style="font-weight: 600;"><%= sess.session_date %></td>
+                    <td><%= new Date(sess.start_time).toLocaleTimeString('vi-VN') %></td>
+                    <td><%= new Date(sess.end_time).toLocaleTimeString('vi-VN') %></td>
+                    <td>
+                      <% if (is_currently_open) { %>
+                        <span class="badge badge-success">Đang mở (Active)</span>
+                      <% } else { %>
+                        <span class="badge badge-danger">Đã kết thúc</span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <% if (is_currently_open) { %>
+                        <a href="/training/classes/<%= class_record.id %>/attendance/open?session_id=<%= sess.id %>" class="btn btn-primary btn-sm" style="padding: 4px 10px; font-size: 11px;">
+                          🖥️ Mở màn hình QR
+                        </a>
+                      <% } else { %>
+                        <span style="color: var(--text-muted); font-size: 12px;">Đã đóng</span>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- TAB 03: CERTIFICATES -->
+  <div id="tab-certificates" class="tab-panel">
+    
+    <div class="panel">
+      <div class="panel-header">
+        <h3 class="panel-title">Danh sách Chứng nhận Đào tạo Số</h3>
+      </div>
+      <div class="panel-body" style="padding: 0;">
+        <% if (certificates.length === 0) { %>
+          <div style="padding: 32px; text-align: center; color: var(--text-muted);">
+            Lớp học chưa cấp phát chứng nhận nào. Hãy mở tab Học viên và nhấn "Tự động xét duyệt cấp phát" để hệ thống tự động sinh chứng chỉ!
+          </div>
+        <% } else { %>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Mã chứng nhận</th>
+                  <th>Học viên được cấp</th>
+                  <th>Email học viên</th>
+                  <th>Ngày cấp phát</th>
+                  <th>Trạng thái pháp lý</th>
+                  <th>In ấn</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% certificates.forEach(function(cert) { %>
+                  <tr>
+                    <td style="font-family: monospace; font-weight: 700; color: var(--primary);">
+                      <%= cert.certificate_code %>
+                    </td>
+                    <td style="font-weight: 600;"><%= cert.trainee_id.full_name %></td>
+                    <td><%= cert.trainee_id.email %></td>
+                    <td><%= new Date(cert.issue_date).toLocaleDateString('vi-VN') %></td>
+                    <td>
+                      <span class="badge badge-success">Có hiệu lực</span>
+                    </td>
+                    <td>
+                      <a href="/attendance/certificates/view?code=<%= cert.certificate_code %>" target="_blank" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 11px;">
+                        🖼️ Mở Chứng chỉ in ấn
+                      </a>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+    </div>
+    
+  </div>
+  
+</div>
+
+<!-- Tab Switching JS -->
+<script>
+  function switchTab(tabName) {
+    // Hide all tab panels
+    document.querySelectorAll('.tab-panel').forEach(panel => {
+      panel.classList.remove('active');
+    });
+    // Remove active class from all links
+    document.querySelectorAll('.tab-link').forEach(link => {
+      link.classList.remove('active');
+    });
+    
+    // Show active panel & link
+    document.getElementById(`tab-${tabName}`).classList.add('active');
+    // Find matching link
+    const links = document.querySelectorAll('.tab-link');
+    if (tabName === 'trainees') links[0].classList.add('active');
+    else if (tabName === 'attendance') links[1].classList.add('active');
+    else if (tabName === 'certificates') links[2].classList.add('active');
+  }
+</script>
