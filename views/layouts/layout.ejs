@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Hệ thống Quản lý Nội bộ - VN168' %></title>
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="/styles/main.css">
+  <!-- Dynamic Styles injection if any -->
+  <%- typeof exposure !== 'undefined' ? exposure : '' %>
+</head>
+<body data-theme="light">
+  
+  <% if (typeof no_layout !== 'undefined' && no_layout) { %>
+    <!-- Plain Auth Page Layout -->
+    <%- body %>
+  <% } else { %>
+    <!-- Main Administrative Console Layout -->
+    <div class="app-container">
+      
+      <!-- Sidebar -->
+      <%- include('../partials/sidebar.ejs') %>
+      
+      <!-- Main Content Container -->
+      <div class="main-wrapper">
+        
+        <!-- Header -->
+        <%- include('../partials/header.ejs') %>
+        
+        <!-- Content Body -->
+        <main class="content-body">
+          <!-- Dynamic Alerts -->
+          <%- include('../partials/alerts.ejs') %>
+          
+          <!-- Page Core Body -->
+          <%- body %>
+        </main>
+        
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Theme Toggle Script & Global Behaviors -->
+  <script>
+    // Initialize Theme from localStorage
+    const savedTheme = localStorage.getItem('vn168_theme') || 'light';
+    document.body.setAttribute('data-theme', savedTheme);
+    
+    function toggleTheme() {
+      const currentTheme = document.body.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', newTheme);
+      localStorage.setItem('vn168_theme', newTheme);
+    }
+  </script>
+</body>
+</html>
