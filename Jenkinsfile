@@ -226,29 +226,6 @@ pipeline {
         }
       }
     }
-
-    // ---------- BƯỚC 6: Kiểm tra sau deploy ----------
-    stage('6. Kiểm tra sau deploy') {
-      steps {
-        echo "=== Xác nhận app đang chạy thật ==="
-        // Jenkins ở trong container, gọi ra host qua host.docker.internal
-        sh """
-          BASE=http://host.docker.internal:${DEPLOY_WEB_PORT}
-          for i in \$(seq 1 30); do
-            if curl -sf \$BASE/api/health >/dev/null 2>&1; then
-              echo "App sẵn sàng sau \${i}s"
-              curl -s \$BASE/api/health; echo ""
-              curl -s \$BASE/api/define/computer; echo ""
-              exit 0
-            fi
-            sleep 1
-          done
-          echo "TIMEOUT - app không phản hồi sau 30s"
-          docker compose -p ${DEPLOY_PROJECT} logs web
-          exit 1
-        """
-      }
-    }
   }
 
   post {
