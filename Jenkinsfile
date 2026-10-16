@@ -29,7 +29,7 @@ pipeline {
     // Credential kiểu "Username with password":
     //   user     = tên GitHub
     //   password = Personal Access Token có quyền write:packages
-    GHCR_CREDS = credentials('ghcr-credentials')
+    GHCR_CREDS = credentials('ghcr-credentials1')
 
     // Các kiến trúc sẽ push lên registry
     PLATFORMS = 'linux/amd64,linux/arm64'
