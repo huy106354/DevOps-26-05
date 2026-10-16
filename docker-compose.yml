@@ -4,7 +4,6 @@ services:
   # Phân hệ Cơ sở dữ liệu: PostgreSQL 17 Alpine
   db:
     image: postgres:17-alpine
-    container_name: vn168_postgres_17
     restart: always
     environment:
       POSTGRES_DB: vn168_internal_db
@@ -18,7 +17,6 @@ services:
   # Phân hệ Cache hiệu năng cao: Redis 7 Alpine
   cache:
     image: redis:7-alpine
-    container_name: vn168_redis_cache
     restart: always
     ports:
       - "6376:6379"
@@ -26,7 +24,6 @@ services:
   # Phân hệ Web Application: SailsJS (Chạy Node.js 24 Alpine)
   web:
     build: .
-    container_name: vn168_web_app
     restart: always
     ports:
       - "1337:1337"

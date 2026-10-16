@@ -213,6 +213,11 @@ pipeline {
           "POSTGRES_PASSWORD=vn168_secure_pass_2026",
           "POSTGRES_DB=vn168_internal_db"
         ]) {
+          // Don dep 1 LAN cac container ten cu (container_name co dinh truoc day).
+          // Compose gio dat ten theo project nen tu lan sau lenh nay khong con gi de xoa
+          // (no-op), va DB KHONG bi tao lai moi lan deploy nua.
+          sh 'docker rm -f vn168_postgres_17 vn168_redis_cache vn168_web_app 2>/dev/null || true'
+
           sh """
             docker compose -p ${DEPLOY_PROJECT} \
               -f docker-compose.yml \
